@@ -110,7 +110,7 @@ class Simulator(object):
         """
         self._map[ID] = self._num_qubits
         self._num_qubits += 1
-        self._state.resize(1 << self._num_qubits)
+        self._state.resize(1 << self._num_qubits, refcheck=False)
 
     def get_classical_value(self, ID, tol=1.e-10):
         """
