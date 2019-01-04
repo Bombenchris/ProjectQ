@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    triggers {
-        pollSCM('* * * * *')
-    }
-
     options {
         skipDefaultCheckout(true)
         // Keep the 10 most recent builds
