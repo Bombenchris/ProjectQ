@@ -20,6 +20,14 @@ pipeline {
         stage ("Code pull"){
             steps{
                 checkout scm
+		step([$class: 'LastChangesPublisher',
+		      since:'PREVIOUS_REVISION',
+		      format: 'SIDE',
+		      matchWordsThreshold: '0.25',
+		      matching: 'NONE',
+		      matchingMaxComparisons: '2500',
+		      showFiles: true,
+		      synchronisedScroll: true])
             }
         }
 
