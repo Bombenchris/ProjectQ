@@ -11,7 +11,6 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-
 """
 Registers a few default replacement rules for Shor's algorithm to work
 (see Examples).
@@ -20,13 +19,9 @@ Registers a few default replacement rules for Shor's algorithm to work
 from projectq.meta import Control, Dagger
 from projectq.cengines import DecompositionRule
 
-from ._gates import (AddConstant,
-                     SubConstant,
-                     AddConstantModN,
-                     SubConstantModN,
-                     MultiplyByConstantModN)
-from ._constantmath import (add_constant,
-                            add_constant_modN,
+from ._gates import (AddConstant, SubConstant, AddConstantModN,
+                     SubConstantModN, MultiplyByConstantModN)
+from ._constantmath import (add_constant, add_constant_modN,
                             mul_by_constant_modN)
 
 
@@ -57,6 +52,7 @@ def _replace_multiplybyconstantmodN(cmd):
 
     with Control(eng, cmd.control_qubits):
         mul_by_constant_modN(eng, c, N, quint)
+
 
 all_defined_decomposition_rules = [
     DecompositionRule(AddConstant, _replace_addconstant),
