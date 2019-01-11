@@ -273,7 +273,7 @@ class MainEngine(BasicEngine):
         """
         try:
             self.next_engine.receive(command_list)
-        except:
+        except AttributeError:
             if self.verbose:
                 raise
             else:

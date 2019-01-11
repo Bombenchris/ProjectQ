@@ -11,7 +11,6 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-
 """
 Contains meta gates, i.e.,
 * DaggeredGate (Represents the inverse of an arbitrary gate)
@@ -83,7 +82,7 @@ class DaggeredGate(BasicGate):
         """
         Return string representation (str(gate) + \"^\dagger\").
         """
-        return str(self._gate) + "^\dagger"
+        return str(self._gate) + r"^\dagger"
 
     def tex_str(self):
         """
@@ -224,8 +223,8 @@ class ControlledGate(BasicGate):
 
     def __eq__(self, other):
         """ Compare two ControlledGate objects (return True if equal). """
-        return (isinstance(other, self.__class__) and
-                self._gate == other._gate and self._n == other._n)
+        return (isinstance(other, self.__class__) and self._gate == other._gate
+                and self._n == other._n)
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -290,6 +289,7 @@ class Tensor(BasicGate):
         assert isinstance(qubits, list)
         for qubit in qubits:
             self._gate | qubit
+
 
 #: Shortcut (instance of) :class:`projectq.ops.Tensor`
 All = Tensor
