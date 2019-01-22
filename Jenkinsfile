@@ -66,6 +66,63 @@ pipeline {
             }
         }
 
+	stage('Quality check') {
+	    parallel {
+		stage('PEP8 - PyCodeStyle') {
+		    steps {
+			echo "PEP8 Style check"
+			sh  ''' . /usr/local/bin/virtualenvwrapper.sh
+                                set +e && workon ${BUILD_TAG}
+                                mkdir -p reports
+                                python3 -m pycodestyle projectq > reports/pycodestyle.log || true
+                            '''
+		    }
+		}
+		stage('PyLint') {
+		    steps {
+			echo "PyLint Style check"
+			sh  ''' . /usr/local/bin/virtualenvwrapper.sh
+                                set +e && workon ${BUILD_TAG}
+                                mkdir -p reports
+                                python3 -m pylint -j 2 --exit-zero --rcfile=.pylintrc projectq > reports/pylint.log
+                            '''
+		    }
+		}
+		stage('Flake8') {
+		    steps {
+			echo "Flake8 Style check"
+			sh  ''' . /usr/local/bin/virtualenvwrapper.sh
+                                set +e && workon ${BUILD_TAG}
+                                mkdir -p reports
+                                python3 -m flake8 --format pylint --exclude '*_test.py' --exit-zero --output-file reports/flake8.log  projectq
+                            '''
+		    }
+		}
+		stage('PMD CPD') {
+		    steps {
+			echo "PMD Copy-paste detector"
+			sh  ''' mkdir -p reports
+                                find projectq -name '*.py' -and ! -name '*_test.py' -and ! -name '.*' > file_list.txt
+                                pmd cpd --language python --format xml --minimum-tokens 100 --failOnViolation false --filelist file_list.txt > reports/cpd.xml
+                            '''
+		    }
+		}
+	    }
+	    post {
+		always {
+		    recordIssues enabledForFailure: true, tools: [pep8(pattern: 'reports/pycodestyle.log'),
+								  pyLint(pattern: 'reports/pylint.log'),
+								  flake8(pattern: 'reports/flake8.log'),
+								  cpd(pattern: 'reports/cpd.xml'),
+								  taskScanner(excludePattern: '*/*_test.py, */*/*_test.py, */*/*/*_test.py',
+									      highTags: 'FIXME',
+									      ignoreCase: true,
+									      includePattern: '*/*.py, */*/*.py, */*/*/*.py',
+									      normalTags: 'TODO')]
+		}
+	    }
+	}
+
 	stage('Testing') {
 	    parallel {
 		stage('Static code metrics') {
@@ -82,6 +139,7 @@ pipeline {
 			echo "Test coverage"
 			sh  ''' . /usr/local/bin/virtualenvwrapper.sh
                         set +e && workon ${BUILD_TAG}
+                        echo -e '[run]\nomit = *_test.py' > .coveragerc
                         python3 -m pytest --cov=projectq --cov-report xml:reports/coverage.xml
                     '''
 		    }
@@ -101,28 +159,6 @@ pipeline {
 			}
 		    }
 		}
-		stage('Style check') {
-		    steps {
-			echo "PEP8 Style check"
-			sh  ''' . /usr/local/bin/virtualenvwrapper.sh
-                                set +e && workon ${BUILD_TAG}
-                                mkdir -p reports
-                                python3 -m pycodestyle projectq > reports/pycodestyle.log || true
-                            '''
-			echo "PyLint Style check"
-			sh  ''' . /usr/local/bin/virtualenvwrapper.sh
-                                set +e && workon ${BUILD_TAG}
-                                mkdir -p reports
-                                python3 -m pylint --exit-zero --rcfile=.pylintrc projectq > reports/pylint.log
-                            '''				
-		    }
-		    post {
-			always {
-			    recordIssues enabledForFailure: true, tools: [pep8(pattern: 'reports/pycodestyle.log'), pyLint(pattern: 'reports/pylint.log')]
-			}
-		    }
-		}
-
 		stage('Unit tests') {
 		    steps {
 			sh  ''' . /usr/local/bin/virtualenvwrapper.sh
