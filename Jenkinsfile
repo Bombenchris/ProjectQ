@@ -74,7 +74,7 @@ pipeline {
 			sh  ''' . /usr/local/bin/virtualenvwrapper.sh
                                 set +e && workon ${BUILD_TAG}
                                 mkdir -p reports
-                                python3 -m pycodestyle projectq > reports/pycodestyle.log || true
+                                python3 -m pycodestyle --exclude '*_test.py' projectq > reports/pycodestyle.log || true
                             '''
 		    }
 		}
