@@ -139,7 +139,8 @@ pipeline {
 			echo "Test coverage"
 			sh  ''' . /usr/local/bin/virtualenvwrapper.sh
                         set +e && workon ${BUILD_TAG}
-                        echo -e '[run]\nomit = *_test.py' > .coveragerc
+                        echo '[run]' > .coveragerc
+                        echo 'omit = *_test.py' >> .coveragerc
                         python3 -m pytest --cov=projectq --cov-report xml:reports/coverage.xml
                     '''
 		    }
