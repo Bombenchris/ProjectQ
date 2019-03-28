@@ -42,13 +42,16 @@ pipeline {
                         workon ${BUILD_TAG}
                         export PY=3
                         if [[ "$OSTYPE" == "darwin"* ]]; then
-                            for i in {10..1}; do
-                                if [[ `command -v gcc-${i}` ]]; then
-                                    export CC=gcc-${i}
-                                    export CXX=g++-${i}
-                                    break
-                                fi
-                            done
+                            export CC=clang
+                            export CXX=clang++
+                            export LDFLAGS=-L`brew --prefix llvm`/lib
+                            # for i in {10..1}; do
+                            #     if [[ `command -v gcc-${i}` ]]; then
+                            #         export CC=gcc-${i}
+                            #         export CXX=g++-${i}
+                            #         break
+                            #     fi
+                            # done
                         else
                             export CC=gcc
                             export CXX=g++
