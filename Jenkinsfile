@@ -44,17 +44,20 @@ pipeline {
                         pip$PY install --only-binary=numpy,scipy numpy scipy
                         pip$PY install -r requirements.txt
                         pip$PY install pytest-cov
-                        pip$PY install pylint pycodestyle
+                        pip$PY install pylint pycodestyle flake8
                         pip$PY install dormouse
                         
                         if [[ "$OSTYPE" == "darwin"* ]]; then
-                            for i in {10..1}; do
-                                if [[ `command -v gcc-${i}` ]]; then
-                                    export CC=gcc-${i}
-                                    export CXX=g++-${i}
-                                    break
-                                fi
-                            done
+                            export CC=clang
+                            export CXX=clang++
+                            export LDFLAGS=-L`brew --prefix llvm`/lib
+                            # for i in {10..1}; do
+                            #     if [[ `command -v gcc-${i}` ]]; then
+                            #         export CC=gcc-${i}
+                            #         export CXX=g++-${i}
+                            #         break
+                            #     fi
+                            # done
                         else
                             export CC=gcc
                             export CXX=g++
